@@ -7,10 +7,10 @@
 <div id="inner">
 
     <div ng-controller="InnerAppController">
-        <span>{{remaining()}} of {{todos.length}} remaining</span>
+        <span>{{remaining()}} of {{currentTodos.length}} remaining</span>
         [ <a href="" ng-click="archive()">archive</a> ]
         <ul class="unstyled">
-            <li ng-repeat="todo in todos">
+            <li ng-repeat="todo in currentTodos">
                 <input type="checkbox" ng-model="todo.done">
                 <span class="done-{{todo.done}}">{{todo.text}}</span>
             </li>
@@ -18,7 +18,13 @@
         <form ng-submit="addTodo()">
             <input type="text" ng-model="todoText" size="30"
                    placeholder="add new todo here">
-            <input class="btn-primary" type="submit" value="add">
+            <input class="btn-primary" type="submit" value="add todo">
+        </form>
+
+        <form ng-submit="addCategory()">
+            <input type="text" ng-model="categoryText" size="30"
+                   placeholder="add new category here">
+            <input class="btn-primary" type="submit" value="add category">
         </form>
     </div>
 

@@ -1,28 +1,34 @@
 ﻿
-function Service() {
-
-    this.addEntries = angular.bind(this, this.addEntry);
-    this.registerObserverCallback = angular.bind(this, this.registerObserverCallback);
-
-}
+function Service() {}
 
 Service.prototype = {
 
-    observerCallbacks: [],
-    registerObserverCallback: function (callback) {
-        this.observerCallbacks.push(callback);
+    menuChangeCallbacks: [],
+    menuChooseCallbacks: [],
+
+    registerMenuChangeCallback: function (callback) {
+        this.menuChangeCallbacks.push(callback);
     },
-    notifyObservers: function () {
-        var e = this.entries;
-        angular.forEach(this.observerCallbacks, function (callback) {
-            callback(e);
+
+    registerMenuChooseCallback: function (callback) {
+        this.menuChooseCallbacks.push(callback);
+    },
+
+    _notifyObservers: function (observers, data) {
+        angular.forEach(observers, function (callback) {
+            callback(data);
         });
     },
 
     entries: [],
-    addEntry: function (title) {
-        this.entries.push(title);
-        this.notifyObservers();
+
+    updateEntries: function (entries) {
+        this.entries = entries;
+        this._notifyObservers(this.menuChangeCallbacks, entries);
+    },
+
+    chooseEntry: function (entry) {
+        this._notifyObservers(this.menuChooseCallbacks, entry);
     }
 };
 
@@ -38,10 +44,14 @@ angular.element(document).ready(function () {
         .module('Menu', ['Components'])
         .controller('MenuController', ['$scope', 'MenuService', function ($scope, MenuService) {
 
-            MenuService.registerObserverCallback(function (entries) {
+            MenuService.registerMenuChangeCallback(function (entries) {
                 $scope.menus = entries;
                 $scope.$apply();
             });
+
+            $scope.chooseMenu = function (menu) {
+                MenuService.chooseEntry(menu);
+            }
 
         }]);
 

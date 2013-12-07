@@ -16,8 +16,8 @@
             <div id="menu" class="container">
                 <div ng-controller="MenuController">
 
-                    <a ng-repeat="menu in menus" href="/">
-                        {{menu}}
+                    <a ng-repeat="menu in menus" ng-click="chooseMenu(menu)">
+                        {{menu.name}} ({{menu.todoCount}})
                     </a>
 
                 </div>
