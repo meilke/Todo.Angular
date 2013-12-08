@@ -18,7 +18,7 @@
                 <div ng-controller="MenuController">
 
                     <a ng-repeat="menu in menus" ng-click="chooseMenu(menu)">
-                        {{menu.Name}} ({{menu.TodoCount}})
+                        {{menu.Name}} ({{menu.TodoDoneCount}} of {{menu.TodoCount}})
                     </a>
 
                 </div>

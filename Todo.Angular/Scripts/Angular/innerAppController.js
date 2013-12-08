@@ -8,6 +8,7 @@
     this.init();
 
     this.scope.addTodo = angular.bind(this, this.addTodo);
+    this.scope.archive = angular.bind(this, this.deleteDoneTodos);
     this.scope.addCategory = angular.bind(this, this.addCategory);
     this.scope.toggleDone = angular.bind(this, this.toggleDone);
     this.scope.isDone = angular.bind(this, this.isDone);
@@ -18,9 +19,9 @@
 InnerAppController.prototype = {
     init: function () {
 
-        this.categoryResource = this.resource('/api/Category/:categoryId', { categoryId: '@id' });
-        this.todoResource = this.resource('/api/Todo/:todoId', { todoId: '@id' });
-        this.todosFromCategoryResource = this.resource('/api/TodosFromCategory/:categoryId', { categoryId: '@id' });
+        this.categoryResource = this.resource('/api/Category/:categoryId', { categoryId: '@Id' });
+        this.todoResource = this.resource('/api/Todo/:todoId', { todoId: '@Id' });
+        this.todosFromCategoryResource = this.resource('/api/TodosFromCategory/:categoryId', { categoryId: '@Id' });
 
         this.categoryResource.query(angular.bind(this, function (categories) {
             this.updateCategoriesFromResource(categories);
@@ -56,24 +57,32 @@ InnerAppController.prototype = {
     addTodo: function () {
         var newTodo = new this.todoResource({Text: this.scope.todoText, Done: false, CategoryId: this.category.Id});
         newTodo.$save(angular.bind(this, function (todo) {
-
             this.categoryResource.query(angular.bind(this, function (categories) {
                 this.updateCategoriesFromResource(categories, this.category.Id);
             }));
-
         }));
 
         this.scope.todoText = '';
     },
 
+    deleteDoneTodos: function () {
+        var resConstructor = this.todoResource;
+        angular.forEach(this.scope.currentTodos, function (todo) {
+            if (todo.Done) {
+                var todoRes = new resConstructor({ Id: todo.Id });
+                todoRes.$delete();
+            }
+        });
+
+        this.updateCategoriesFromResource(this.categories, this.category.Id);
+    },
+
     addCategory: function () {
         var newCategory = new this.categoryResource({ Name: this.scope.categoryText });
         newCategory.$save(angular.bind(this, function (category) {
-
             this.categoryResource.query(angular.bind(this, function (categories) {
                 this.updateCategoriesFromResource(categories, category.Id);
             }));
-
         }));
 
         this.scope.categoryText = '';

@@ -20,6 +20,7 @@ namespace Todo.Angular.Controllers
         public int Id { get; set; }
         public string Name { get; set; }
         public int TodoCount { get; set; }
+        public int TodoDoneCount { get; set; }
     }
 
     public class CategoryController : ApiController
@@ -35,6 +36,7 @@ namespace Todo.Angular.Controllers
             foreach (var category in Categories)
             {
                 category.TodoCount = TodoController.Todos.Count(t => t.CategoryId == category.Id);
+                category.TodoDoneCount = TodoController.Todos.Count(t => t.CategoryId == category.Id && t.Done);
                 yield return category;
             }
         }
@@ -42,7 +44,10 @@ namespace Todo.Angular.Controllers
         // GET api/category/5
         public Category Get(int id)
         {
-            return Categories.FirstOrDefault(c => c.Id == id);
+            var category = Categories.FirstOrDefault(c => c.Id == id);
+            category.TodoCount = TodoController.Todos.Count(t => t.CategoryId == category.Id);
+            category.TodoDoneCount = TodoController.Todos.Count(t => t.CategoryId == category.Id && t.Done);
+            return category;
         }
 
         // POST api/category
