@@ -9,6 +9,8 @@
 
     this.scope.addTodo = angular.bind(this, this.addTodo);
     this.scope.addCategory = angular.bind(this, this.addCategory);
+    this.scope.toggleDone = angular.bind(this, this.toggleDone);
+    this.scope.isDone = angular.bind(this, this.isDone);
 
     return (this);
 }
@@ -75,7 +77,22 @@ InnerAppController.prototype = {
         }));
 
         this.scope.categoryText = '';
-    }
+    },
+
+    toggleDone: function (todo) {
+        var adjustedTodo = new this.todoResource({ Text: todo.Text, Done: !todo.Done, CategoryId: todo.CategoryId, Id: todo.Id });
+        adjustedTodo.$save(angular.bind(this, function (todo) {
+
+            this.categoryResource.query(angular.bind(this, function (categories) {
+                this.updateCategoriesFromResource(categories, this.category.Id);
+            }));
+
+        }));
+    },
+
+    isDone: function (todo) {
+        return todo.Done;
+    },
 
     //    $scope.remaining = function () {
     //        var count = 0;

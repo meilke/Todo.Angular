@@ -12,7 +12,8 @@
         [ <a href="" ng-click="archive()">archive</a> ]
         <ul class="unstyled">
             <li ng-repeat="todo in currentTodos">
-                <input type="checkbox" ng-model="todo.Done">
+                <input type="checkbox" ng-click="toggleDone(todo)"
+                       ng-checked="isDone(todo)">
                 <span class="done-{{todo.Done}}">{{todo.Text}}</span>
             </li>
         </ul>

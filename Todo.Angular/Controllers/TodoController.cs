@@ -30,8 +30,18 @@ namespace Todo.Angular.Controllers
         // POST api/todo
         public Todo Post([FromBody]Todo value)
         {
-            value.Id = Todos.Select(c => c.Id).Max() + 1;
-            Todos.Add(value);
+            if (value.Id == null)
+            {
+                value.Id = Todos.Select(c => c.Id).Max() + 1;
+                Todos.Add(value);
+            }
+            else
+            {
+                var existing = Todos.First(t => t.Id == value.Id);
+                existing.Done = value.Done;
+                existing.Text = value.Text;
+            }
+            
             return value;
         }
 

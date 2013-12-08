@@ -9,7 +9,7 @@ namespace Todo.Angular.Controllers
 {
     public class Todo
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string Text { get; set; }
         public bool Done { get; set; }
         public int CategoryId { get; set; }
