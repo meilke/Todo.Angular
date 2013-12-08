@@ -1,8 +1,8 @@
 ﻿angular.element(document).ready(function () {
 
     angular
-        .module('App', ['Components'])
-        .controller('InnerAppController', ['$scope', '$filter', 'MenuService', InnerAppController]);
+        .module('App', ['ngResource', 'Components'])
+        .controller('InnerAppController', ['$scope', '$filter', '$resource', 'MenuService', InnerAppController]);
 
     angular.bootstrap($('#inner').get()[0], ['App']);
 });

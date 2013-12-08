@@ -8,6 +8,7 @@
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/Scripts/jquery-1.10.2.js")
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular-resource.js"></script>
     @Scripts.Render("~/Scripts/Angular/app.js")
 </head>
 <body>
@@ -17,7 +18,7 @@
                 <div ng-controller="MenuController">
 
                     <a ng-repeat="menu in menus" ng-click="chooseMenu(menu)">
-                        {{menu.name}} ({{menu.todoCount}})
+                        {{menu.Name}} ({{menu.TodoCount}})
                     </a>
 
                 </div>

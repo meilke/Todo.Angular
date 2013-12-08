@@ -1,7 +1,8 @@
-﻿function InnerAppController($scope, $filter, MenuService) {
+﻿function InnerAppController($scope, $filter, $resource, MenuService) {
 
     this.scope = $scope;
     this.filter = $filter;
+    this.resource = $resource;
     this.menuService = MenuService;
 
     this.init();
@@ -14,58 +15,64 @@
 
 InnerAppController.prototype = {
     init: function () {
-        this.categories = [
-                { id: 1, name: 'First Category', todoCount: 1 }
-        ];
 
-        this.todos = [
-                { id: 1, text: 'First Task', categoryId: 1, done: false }
-        ];
+        this.categoryResource = this.resource('/api/Category/:categoryId', { categoryId: '@id' });
+        this.todoResource = this.resource('/api/Todo/:todoId', { todoId: '@id' });
+        this.todosFromCategoryResource = this.resource('/api/TodosFromCategory/:categoryId', { categoryId: '@id' });
 
-        this.menuService.updateEntries(this.categories);
-        this.category = this.categories[0];
+        this.categoryResource.query(angular.bind(this, function (categories) {
+            this.updateCategoriesFromResource(categories);
+        }));
 
         this.menuService.registerMenuChooseCallback(angular.bind(this, this.switchCategory));
+    },
 
-        this.updateTodos();
+    updateCategoriesFromResource: function (categories, selected) {
+        this.categories = categories;
+        
+        if (!selected) {
+            this.category = this.categories[0];
+        } else {
+            this.category = this.filter('filter')(this.categories, { Id: selected })[0];
+        }
+
+        this.menuService.updateEntries(this.categories, this.category);
+
+        this.todosFromCategoryResource.query({ categoryId: this.category.Id }, angular.bind(this, this.updateTodosFromResource));
     },
 
     switchCategory: function (category) {
         this.category = category;
-        this.updateTodos();
+        this.todosFromCategoryResource.query({ categoryId: this.category.Id }, angular.bind(this, this.updateTodosFromResource));
         this.scope.$apply();
     },
 
-    updateTodos: function () {
-        var todosFromCategory = this.filter('filter')(this.todos, { categoryId: this.category.id });
-        this.scope.currentTodos = todosFromCategory;
+    updateTodosFromResource: function (todos) {
+        this.scope.currentTodos = todos;
     },
 
     addTodo: function () {
-        this.todos.push({ text: this.scope.todoText, done: false, categoryId: this.category.id });
+        var newTodo = new this.todoResource({Text: this.scope.todoText, Done: false, CategoryId: this.category.Id});
+        newTodo.$save(angular.bind(this, function (todo) {
 
-        var todosFromCategory = this.filter('filter')(this.todos, { categoryId: this.category.id });
-        var todosFromCategoryCount = todosFromCategory.length;
+            this.categoryResource.query(angular.bind(this, function (categories) {
+                this.updateCategoriesFromResource(categories, this.category.Id);
+            }));
 
-        this.category.todoCount = todosFromCategoryCount;
+        }));
+
         this.scope.todoText = '';
-
-        this.scope.currentTodos = todosFromCategory;
-
-        this.menuService.updateEntries(this.categories);
     },
 
     addCategory: function () {
+        var newCategory = new this.categoryResource({ Name: this.scope.categoryText });
+        newCategory.$save(angular.bind(this, function (category) {
 
-        var sortedCategories = this.filter('filter')(this.categories, function (category) { return category.id; });
-        var newCategory = { id: sortedCategories[sortedCategories.length - 1].id + 1, name: this.scope.categoryText, todoCount: 0 }
+            this.categoryResource.query(angular.bind(this, function (categories) {
+                this.updateCategoriesFromResource(categories, category.Id);
+            }));
 
-        this.categories.push(newCategory);
-        this.category = newCategory;
-
-        this.updateTodos();
-
-        this.menuService.updateEntries(this.categories);
+        }));
 
         this.scope.categoryText = '';
     }

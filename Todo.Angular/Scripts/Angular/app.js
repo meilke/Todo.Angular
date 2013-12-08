@@ -22,9 +22,9 @@ Service.prototype = {
 
     entries: [],
 
-    updateEntries: function (entries) {
+    updateEntries: function (entries, selected) {
         this.entries = entries;
-        this._notifyObservers(this.menuChangeCallbacks, entries);
+        this._notifyObservers(this.menuChangeCallbacks, { entries: entries, selected: selected });
     },
 
     chooseEntry: function (entry) {
@@ -44,8 +44,8 @@ angular.element(document).ready(function () {
         .module('Menu', ['Components'])
         .controller('MenuController', ['$scope', 'MenuService', function ($scope, MenuService) {
 
-            MenuService.registerMenuChangeCallback(function (entries) {
-                $scope.menus = entries;
+            MenuService.registerMenuChangeCallback(function (update) {
+                $scope.menus = update.entries;
                 $scope.$apply();
             });
 
